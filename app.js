@@ -1,4 +1,4 @@
-const createShip = (shipLength = 1) => {
+const createShip = (name="",shipLength = 1) => {
   let safeLength = shipLength;
   const isHit = () => {
     safeLength = safeLength === 0 ? safeLength : --safeLength;
@@ -13,12 +13,19 @@ const createShip = (shipLength = 1) => {
       return false;
     }
   };
-  return { isHit, isSunk, getSafeLength };
+  const getShipLength=()=>{
+    return shipLength;
+  }
+  const getShiptName=()=>{
+    return name
+  }
+  return { isHit, isSunk, getSafeLength ,getShipLength,getShiptName};
 };
 
 const createSquare = () => {
   let hasShip = false;
   let isSeleted = false;
+  let shipAssociated ;
   function getHasShip() {
     return hasShip;
   }
@@ -31,8 +38,14 @@ const createSquare = () => {
   function setIsSelected(in_isSelected) {
     isSeleted = in_isSelected;
   }
+  function getShipAssociated() {
+    return shipAssociated;
+  }
+  function setShipAssociated(in_shipAssociated) {
+    shipAssociated = in_shipAssociated
+  }
 
-  return { getHasShip, setHasShip, getIsSelected, setIsSelected };
+  return { getHasShip, setHasShip, getIsSelected, setIsSelected ,getShipAssociated,setShipAssociated};
 };
 
 const GameBoard = (gridLength = 10) => {
@@ -54,7 +67,7 @@ const GameBoard = (gridLength = 10) => {
 
   //positionating a ship
   function positionateShip(
-    length,
+    shipToPositionate,
     orientation = "horizontal",
     rowOfFirstSquareCoordinate,
     colOfFirstSquareCoordinate
@@ -63,17 +76,23 @@ const GameBoard = (gridLength = 10) => {
       managePositionRefused();
     } else if (isPositionAvailable() === true) {
       if (orientation === "horizontal") {
-        for (let i = 0; i < length; i++) {
+        for (let i = 0; i < shipToPositionate.getShipLength(); i++) {
           board[rowOfFirstSquareCoordinate][
             colOfFirstSquareCoordinate + i
           ].setHasShip(true);
+          board[rowOfFirstSquareCoordinate][
+            colOfFirstSquareCoordinate + i
+          ].setShipAssociated(shipToPositionate)
         }
       }
       if (orientation === "vertical") {
-        for (let i = 0; i < length; i++) {
+        for (let i = 0; i < shipToPositionate.getShipLength(); i++) {
           board[rowOfFirstSquareCoordinate + i][
             colOfFirstSquareCoordinate
           ].setHasShip(true);
+          board[rowOfFirstSquareCoordinate + i][
+            colOfFirstSquareCoordinate
+          ].setShipAssociated(shipToPositionate)
         }
       }
     } else throw "there is a problem at the isPositionAvailable function";
@@ -89,10 +108,10 @@ const GameBoard = (gridLength = 10) => {
         return false;
       }
       if (orientation === "horizontal") {
-        if (colOfFirstSquareCoordinate + length - 1 > gridLength - 1) {
+        if (colOfFirstSquareCoordinate + shipToPositionate.getShipLength() - 1 > gridLength - 1) {
           return false;
         }
-        for (let i = 0; i < length; i++) {
+        for (let i = 0; i < shipToPositionate.getShipLength(); i++) {
           i;
           if (
             board[rowOfFirstSquareCoordinate][
@@ -104,10 +123,10 @@ const GameBoard = (gridLength = 10) => {
         }
       }
       if (orientation === "vertical") {
-        if (rowOfFirstSquareCoordinate + length - 1 > gridLength - 1) {
+        if (rowOfFirstSquareCoordinate + shipToPositionate.getShipLength() - 1 > gridLength - 1) {
           return false;
         }
-        for (let i = 0; i < length; i++) {
+        for (let i = 0; i < shipToPositionate.getShipLength(); i++) {
           if (
             board[rowOfFirstSquareCoordinate + i][
               colOfFirstSquareCoordinate
@@ -128,3 +147,13 @@ const GameBoard = (gridLength = 10) => {
 
   return { getBoard, positionateShip, updateBoard };
 };
+
+function GameController(){
+  const board1=GameBoard(3);
+  const carrier=createShip("carrier",2);
+  board1.positionateShip(carrier,"horizontal",1,1)
+  
+
+
+}
+GameController()
