@@ -1,3 +1,17 @@
+ //test recieveAttack
+ receiveAttack(board1,1,1)
+ let z=carrier.getSafeLength()
+ z
+ receiveAttack(board1,1,2)
+  z=carrier.getSafeLength()
+ z
+ z=board1.getBoard()[0][0].getIsSelected()
+ z
+
+ receiveAttack(board1,0,0)
+  z=board1.getBoard()[1][2].getIsSelected()
+ z
+
 //test ships position isPositionAvailable()
 const myBoard = GameBoard(3);
 let boardSquares = myBoard.getBoard();

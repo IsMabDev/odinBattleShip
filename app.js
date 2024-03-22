@@ -1,11 +1,21 @@
+//dom creation
+
+//this part is missing
+
+
+
 const createShip = (name="",shipLength = 1) => {
   let safeLength = shipLength;
   const isHit = () => {
     safeLength = safeLength === 0 ? safeLength : --safeLength;
   };
+
+  //When is hit the length decrement by one and the getSafeLength give how many length is still have
   const getSafeLength = () => {
     return safeLength;
   };
+
+  
   const isSunk = () => {
     if (safeLength === 0) {
       return true;
@@ -16,12 +26,15 @@ const createShip = (name="",shipLength = 1) => {
   const getShipLength=()=>{
     return shipLength;
   }
-  const getShiptName=()=>{
+  const getShipName=()=>{
     return name
   }
-  return { isHit, isSunk, getSafeLength ,getShipLength,getShiptName};
+  return { isHit, isSunk, getSafeLength ,getShipLength,getShipName: getShipName};
 };
 
+//The square is the cell on the board
+//it can be selected when receiving an attack 
+//a ship can be associated with a square
 const createSquare = () => {
   let hasShip = false;
   let isSeleted = false;
@@ -48,6 +61,8 @@ const createSquare = () => {
   return { getHasShip, setHasShip, getIsSelected, setIsSelected ,getShipAssociated,setShipAssociated};
 };
 
+//the gameboard will contain squares
+//ships can be positionated on the board
 const GameBoard = (gridLength = 10) => {
   const board = [];
 
@@ -74,6 +89,7 @@ const GameBoard = (gridLength = 10) => {
   ) {
     if (isPositionAvailable() === false) {
       managePositionRefused();
+      return false
     } else if (isPositionAvailable() === true) {
       if (orientation === "horizontal") {
         for (let i = 0; i < shipToPositionate.getShipLength(); i++) {
@@ -84,6 +100,7 @@ const GameBoard = (gridLength = 10) => {
             colOfFirstSquareCoordinate + i
           ].setShipAssociated(shipToPositionate)
         }
+        return true
       }
       if (orientation === "vertical") {
         for (let i = 0; i < shipToPositionate.getShipLength(); i++) {
@@ -94,6 +111,7 @@ const GameBoard = (gridLength = 10) => {
             colOfFirstSquareCoordinate
           ].setShipAssociated(shipToPositionate)
         }
+        return true;
       }
     } else throw "there is a problem at the isPositionAvailable function";
 
@@ -142,18 +160,92 @@ const GameBoard = (gridLength = 10) => {
     function managePositionRefused() {
       console.log("Cannot position the ship choose another position");
     }
-    return { isPositionAvailable };
+    // return { isPositionAvailable };
   }
 
   return { getBoard, positionateShip, updateBoard };
 };
 
-function GameController(){
-  const board1=GameBoard(3);
-  const carrier=createShip("carrier",2);
-  board1.positionateShip(carrier,"horizontal",1,1)
-  
 
+//the gamecontroller manage the game by adding boards for each player  
+function GameController(){
+  let board1=GameBoard(10)
+  let   player1=createPlayer("minzo")
+
+
+  function createPlayer(name,shipsLengthArray=[5,4,3,3,2]){
+    let playerShips=[];
+    //create ships according to the shipsLengthArray
+    for(let i in shipsLengthArray){
+      
+      playerShips.push(createShip("ship"+(parseInt(i)+1),shipsLengthArray[i]))
+      
+    }
+    let player={name,playerShips}
+    
+    return player
+  }
+
+
+  function randomPositionPlayerShips(player){
+    let ships=player.playerShips;
+    for(let ship of ships){
+      let orientation=["horizontal","vertical"]
+      let randomOrientation;
+      let randomRow;
+      let randomCol;
+      do{
+       randomOrientation=orientation[Math.floor(2*Math.random())]
+       randomRow=Math.floor(board1.getBoard().length*Math.random())
+       randomCol=Math.floor(board1.getBoard().length*Math.random())
+      
+      
+    } while (board1.positionateShip(ship,randomOrientation,randomRow,randomCol)===false)
+  }
+
+  
+  }
+
+  //this is to test
+  randomPositionPlayerShips(player1);
+  printBoard(board1)
+
+  //this function is to be completed that it shows all the informations needed on a board
+  function printBoard(board){
+    let length=board.getBoard().length
+    let hasShipSquares=[]
+    let numberOfTrue=0;
+    const getShipsPosition=()=>{
+      
+      for (let i=0;i<length;i++){
+        hasShipSquares[i]=[]
+        for(let j=0;j<length;j++){
+          if (board1.getBoard()[i][j].getHasShip()) numberOfTrue++
+          console.log('numberOfTrue: ', numberOfTrue);
+          hasShipSquares[i][j]=board1.getBoard()[i][j].getHasShip()
+        }
+      }
+      
+     
+    }
+
+    //this is to test to be removed after
+    getShipsPosition()
+  }
+
+
+  function receiveAttack(board,row,column){
+    let squareAttacked=board.getBoard()[row][column];
+    if (squareAttacked.getIsSelected()) {
+      return;}
+    if (squareAttacked.getHasShip()){
+      squareAttacked.getShipAssociated().isHit()
+      squareAttacked.setIsSelected(true);
+
+    } else {squareAttacked.setIsSelected(true);}
+  }
+
+ 
 
 }
 GameController()
